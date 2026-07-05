@@ -40,28 +40,34 @@ async function handleGiftRequest(e) {
   const userPrompt = userInput.value.trim();
   if (!userPrompt) return;
 
-  /**
-   * Challenge: Adding AI to the Gift Genie UI
-   *
-   * The UI is wired up.
-   * The loading state is ready.
-   * But no AI request happens yet.
-   *
-   * Your task:
-   *
-   * 1. Add a user message to the messages array
-   * 2. Send a chat completions request
-   * 3. Extract the assistant’s response
-   * 4. Render it inside #output-content
-   *
-   * 💡 Check the hints folder for more guidance!
-   */
+
 
   // Set loading state
   setLoading(true);
 
-  // Clear loading state
-  setLoading(false);
+  messages.push({
+    role: "user",
+    content: userPrompt
+  })
+
+  try {
+    const response = await openai.chat.completions.create({
+      model: process.env.AI_MODEL,
+      messages
+    })
+
+    const giftSuggestions = response.choices[0].message.content
+
+    outputContent.textContent = giftSuggestions
+  } catch (err) {
+    console.error("Error sending the ai api call: ", err)
+    outputContent.textContent = "There was an issue with the selected model. Change the model and try again. Technical error: " + err.message
+  } finally {
+    // Clear loading state
+    setLoading(false);
+  }
+
+
 }
 
 start();
