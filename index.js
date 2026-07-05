@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 import { autoResizeTextarea, checkEnvironment, setLoading } from "./utils.js";
-import {marked} from 'marked'
+import { marked } from 'marked'
 import DOMPurify from 'dompurify'
 
 checkEnvironment();
@@ -56,14 +56,25 @@ async function handleGiftRequest(e) {
   try {
     const response = await openai.chat.completions.create({
       model: process.env.AI_MODEL,
-      messages
+      messages,
+      stream: true
     })
 
+    // The streaming process
+    let giftSuggestionsStream = ""
+
+    for await (const chunk of response) {
+      giftSuggestionsStream += response.choices[0].delta.content
+      const parsedResponse = marked.parse(giftSuggestionsStream)
+      const sanitizedResponse = DOMPurify.sanitize(parsedResponse)
+      outputContent.innerHTML = sanitizedResponse
+    }
+
     // The proceedure of taking the response, turn it into Markdown, sanitize it and then present it as parsed and sanitized HTML
-    const giftSuggestions = response.choices[0].message.content
-    const parsedResponse = marked.parse(giftSuggestions)
-    const sanitizedResponse = DOMPurify.sanitize(parsedResponse)
-    outputContent.innerHTML = sanitizedResponse
+    // const giftSuggestions = response.choices[0].message.content
+    // const parsedResponse = marked.parse(giftSuggestions)
+    // const sanitizedResponse = DOMPurify.sanitize(parsedResponse)
+    // outputContent.innerHTML = sanitizedResponse
 
   } catch (err) {
     console.error("Error sending the ai api call: ", err)
