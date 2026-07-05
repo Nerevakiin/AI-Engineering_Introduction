@@ -1,5 +1,8 @@
 import OpenAI from "openai";
 import { autoResizeTextarea, checkEnvironment, setLoading } from "./utils.js";
+import {marked} from 'marked'
+import DOMPurify from 'dompurify'
+
 checkEnvironment();
 
 // Initialize an OpenAI client for your provider using env vars
@@ -56,9 +59,12 @@ async function handleGiftRequest(e) {
       messages
     })
 
+    // The proceedure of taking the response, turn it into Markdown, sanitize it and then present it as parsed and sanitized HTML
     const giftSuggestions = response.choices[0].message.content
+    const parsedResponse = marked.parse(giftSuggestions)
+    const sanitizedResponse = DOMPurify.sanitize(parsedResponse)
+    outputContent.innerHTML = sanitizedResponse
 
-    outputContent.textContent = giftSuggestions
   } catch (err) {
     console.error("Error sending the ai api call: ", err)
     outputContent.textContent = "There was an issue with the selected model. Change the model and try again. Technical error: " + err.message
@@ -66,8 +72,6 @@ async function handleGiftRequest(e) {
     // Clear loading state
     setLoading(false);
   }
-
-
 }
 
 start();
