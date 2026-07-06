@@ -36,7 +36,11 @@ const messages = [
     Enforce the following structure for every response:
     1. Every gift should have a clear heading title.
     2. Every gift should have a short and clear explaination on the why each gift is right for the person given.
-    3. End every response with a "Questions for you" section with a follow-up question that would help improve recommendations`,
+    3. End every response with a "Questions for you" h2 heading section with a follow-up question that would help improve recommendations
+    
+    Take close attention to the context given. Be aware of user's limitations and restrictions.
+    If a location or constraint is mentioned, adapt the ideas
+    If there are specific constrained mentioned or implied, Add a short section under each gift that guides the user on how to get the gift in that constrained context.`,
   },
 ];
 
