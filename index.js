@@ -160,7 +160,9 @@ async function handleGiftRequest(e) {
     const response = await openai.chat.completions.create({
       model: process.env.AI_MODEL,
       messages,
-      stream: true
+      stream: true,
+      temperature: 0,
+      top_p: 1
     })
 
     // The streaming process
