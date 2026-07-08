@@ -162,7 +162,9 @@ async function handleGiftRequest(e) {
       messages,
       stream: true,
       temperature: 0,
-      top_p: 1
+      top_p: 1,
+      // tools: [{type: "web_search"}] WE CAN USE THIS USING THE 'RESPONSES' API, ITS NOT AVAILABLE LIKE THIS WITH CHAT COMPLETIONS.
+      // response_format = giftSchema THIS IS HOW IT WOULD BE IF WE IMPORTED THE SCHEMA FOR JSON OUTPUTS
     })
 
     // The streaming process
