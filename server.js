@@ -1,7 +1,11 @@
 import express from 'express'
+import OpenAI from 'openai'
+import dotenv from 'dotenv'
 
 const app = express()
 app.use(express.json())
+
+dotenv.config()
 
 const PORT = 3001
 
@@ -128,13 +132,10 @@ An experience beats an object for a devoted fan. A local show or a destination f
 ];
 
 
-messages.push({
-    role: "user",
-    content: `Generate fresh gift ideas for this new user request: ${userPrompt}`
-})
+
 
 // handle the api request from the front end
-app.post("/api/gift", (req, res) => {
+app.post("/api/gift", async (req, res) => {
 
     try {
 
