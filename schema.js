@@ -1,4 +1,4 @@
-// If we wish to handle each response as JSON format types then we can import and use schemas like this to specifically guide the model on the
+// If we wish to handle each response as JSON format types then we can import and use schemas like this to specifically guide and enforce the model on the
 // right way to structure responses
 
 export const giftSchema = {
