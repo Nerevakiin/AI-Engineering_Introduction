@@ -7,16 +7,16 @@ const PORT = 3001
 
 // Initialize an OpenAI client for your provider using env vars
 const openai = new OpenAI({
-  apiKey: process.env.AI_KEY,
-  baseURL: process.env.AI_URL,
-  dangerouslyAllowBrowser: true,
+    apiKey: process.env.AI_KEY,
+    baseURL: process.env.AI_URL,
+    dangerouslyAllowBrowser: true,
 });
 
 // Initialize messages array with system prompt
 const messages = [
-  {
-    role: "system",
-    content: `You are the Gift Genie!
+    {
+        role: "system",
+        content: `You are the Gift Genie!
     Make your gift suggestions thoughtful and practical.
     The user will describe the gift's recipient. 
     Your response must be in structured Markdown. 
@@ -30,17 +30,17 @@ const messages = [
     Take close attention to the context given. Be aware of user's limitations and restrictions.
     If a location or constraint is mentioned, adapt the ideas
     If there are specific constrained mentioned or implied, Add a short section under each gift that guides the user on how to get the gift in that constrained context.`,
-  },
+    },
 
-  // "Few Shot Prompting" or "Examples" is injecting into the first message and system prompt a mock conversation that
-  // looks like it's already ongoing in order to show to the model what an appropriate and good response really looks like.
-  {
-    role: "user",
-    content: `dubai airport. last minute gifts for niece (arts & crafts) and nephew who loves football`
-  },
-  {
-    role: "assistant",
-    content: `
+    // "Few Shot Prompting" or "Examples" is injecting into the first message and system prompt a mock conversation that
+    // looks like it's already ongoing in order to show to the model what an appropriate and good response really looks like.
+    {
+        role: "user",
+        content: `dubai airport. last minute gifts for niece (arts & crafts) and nephew who loves football`
+    },
+    {
+        role: "assistant",
+        content: `
     ### Travel Art Kit for Niece (Compact & Portable)
 
       A small, kid-friendly arts & crafts item that's easy to pack and perfect for a quick creative distraction during travel.
@@ -72,14 +72,14 @@ const messages = [
       3. Are you departing from Terminal 3?
       4. Does your nephew support a specific team?
     `
-  },
-  {
-    role: "user",
-    content: "gift ideas for a big black metal fan"
-  },
-  {
-    role: "assistant",
-    content: `
+    },
+    {
+        role: "user",
+        content: "gift ideas for a big black metal fan"
+    },
+    {
+        role: "assistant",
+        content: `
     ### Vinyl Reissue of a Genre Classic
 
 A well-pressed reissue of a foundational album — Darkthrone's *A Blaze in the Northern Sky*, Emperor's *In the Nightside Eclipse*, or Bathory's early work — feeds the collector instinct that runs deep in this scene.
@@ -124,21 +124,51 @@ An experience beats an object for a devoted fan. A local show or a destination f
 4. Is this someone who wears merch openly, or keeps their fandom more private?
 5. Any location or date you're working around, so I can add exact buying steps?
     `
-  }
+    }
 ];
 
 
 messages.push({
     role: "user",
     content: `Generate fresh gift ideas for this new user request: ${userPrompt}`
-  })
+})
 
 // handle the api request from the front end
 app.post("/api/gift", (req, res) => {
-    const { userPrompt } = req.body 
-    console.log(userPrompt)
 
-    res.json({ message: `You asked for: "${userPrompt}"` })
+    try {
+
+        // 2. extract userPrompt from req.body and add to messages
+        const { userPrompt } = req.body
+        console.log("Hello from the server, this is the userprompt, and the body: ", userPrompt, req.body)
+
+        messages.push({
+            role: "user",
+            content: userPrompt
+        })
+
+        // 3. send chat completions request
+        const aiResponse = openai.chat.completions.create({
+            model: process.env.AI_MODEL,
+            messages,
+            stream: true
+        })
+
+        // 4. extract content and send back as json
+        let giftSuggestionStream = ""
+
+        for await (const chunk of aiResponse) {
+            giftSuggestionStream += chunk.choices[0].delta.content
+        }
+
+        res.status(200).json({ giftSuggestions: giftSuggestions })
+
+
+    } catch (error) {
+        console.log("error when sending the ai response: ", error)
+        res.status(501).json({ error: "Not implemented" });
+    }
+
 })
 
 app.listen(PORT, () => {
