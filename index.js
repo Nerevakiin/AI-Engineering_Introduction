@@ -167,6 +167,18 @@ async function handleGiftRequest(e) {
       // response_format = giftSchema THIS IS HOW IT WOULD BE IF WE IMPORTED THE SCHEMA FOR JSON OUTPUTS
     })
 
+    // An example response with the RESPONSES API
+    /*
+    const response = await openai.responses.create({
+      model: process.env.AI_MODEL,
+      input: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
+      ],
+      tools: [{ type: "web_search_preview" }],
+    });
+    */
+
     // The streaming process
     let giftSuggestionsStream = ""
 
