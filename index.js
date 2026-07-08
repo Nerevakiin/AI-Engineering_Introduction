@@ -157,6 +157,20 @@ async function handleGiftRequest(e) {
   })
 
   try {
+    
+    const response = await fetch('/api/gift', {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json" 
+      },
+      body: JSON.stringify({ userPrompt })
+    })
+
+    const data = await response.json()
+    
+    
+    // COMMENTED CODE BELOW BECAUSE OF THE MIGRATION TO THE BACKEND.
+    /*
     const response = await openai.chat.completions.create({
       model: process.env.AI_MODEL,
       messages,
@@ -168,7 +182,7 @@ async function handleGiftRequest(e) {
     })
 
     // An example response with the RESPONSES API
-    /*
+    
     const response = await openai.responses.create({
       model: process.env.AI_MODEL,
       input: [
