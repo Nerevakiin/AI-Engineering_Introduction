@@ -1,9 +1,10 @@
-import OpenAI from "openai";
-import { autoResizeTextarea, checkEnvironment, setLoading } from "./utils.js";
-import { marked } from 'marked'
-import DOMPurify from 'dompurify'
+// import OpenAI from "openai";
+import { autoResizeTextarea, setLoading, showStream } from "./utils.js";
+// import { marked } from 'marked'
+// import DOMPurify from 'dompurify'
+import { marked } from "https://esm.sh/marked";
+import DOMPurify from "https://esm.sh/dompurify";
 
-checkEnvironment();
 
 /* Migrated to the backend
 // Initialize an OpenAI client for your provider using env vars
@@ -52,11 +53,11 @@ async function handleGiftRequest(e) {
     // 1. send fetch request to /api/gift
     const response = await fetch('/api/gift', {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: {"Content-Type": "application/json"},
       body: JSON.stringify({ userPrompt })
     })
+
+    showStream()
 
     const data = await response.json()
     console.log("the data that we have on the font end: ", data)
@@ -65,10 +66,10 @@ async function handleGiftRequest(e) {
     const giftSuggestions = data.giftSuggestions
 
     // The streaming process
-    let giftSuggestionsStream = ""
+    // let giftSuggestionsStream = ""
 
     // Convert Markdown to HTML
-    const parsedResponse = marked.parse(giftSuggestionsStream)
+    const parsedResponse = marked.parse(giftSuggestions)
     // Sanitize the HTML to prevent XSS attacks
     const sanitizedResponse = DOMPurify.sanitize(parsedResponse)
     // Render the result

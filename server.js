@@ -1,6 +1,28 @@
 import express from 'express'
 import OpenAI from 'openai'
 import dotenv from 'dotenv'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+/**
+ * Check that environment variables are configured
+ */
+function checkEnvironment() {
+  if (!process.env.AI_URL) {
+    throw new Error(
+      "Missing AI_URL. This tells us which AI provider you're using."
+    );
+  }
+  if (!process.env.AI_MODEL) {
+    throw new Error("Missing AI_MODEL. The AI request needs a model name.");
+  }
+  if (!process.env.AI_KEY) {
+    throw new Error("Missing AI_KEY. Your API key is not being picked up.");
+  }
+  console.log("AI provider URL:", process.env.AI_URL);
+  console.log("AI model:", process.env.AI_MODEL);
+}
+
 
 const app = express()
 app.use(express.json())
@@ -9,11 +31,29 @@ dotenv.config()
 
 const PORT = 3001
 
+
+// Serve the front end files specifically! IMPORTANT!
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "index.html"))
+})
+app.get("/style.css", (req, res) => {
+    res.sendFile(path.join(__dirname, "style.css"))
+})
+app.get("/index.js", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.js"));
+});
+app.get("/utils.js", (req, res) => {
+  res.sendFile(path.join(__dirname, "utils.js"));
+});
+
+
+
 // Initialize an OpenAI client for your provider using env vars
 const openai = new OpenAI({
     apiKey: process.env.AI_KEY,
-    baseURL: process.env.AI_URL,
-    dangerouslyAllowBrowser: true,
+    baseURL: process.env.AI_URL
+    // dangerouslyAllowBrowser: true,
 });
 
 // Initialize messages array with system prompt
@@ -149,17 +189,20 @@ app.post("/api/gift", async (req, res) => {
         })
 
         // 3. send chat completions request
-        const aiResponse = openai.chat.completions.create({
+        const aiResponse = await openai.chat.completions.create({
             model: process.env.AI_MODEL,
             messages,
             stream: true
         })
 
+        // Tell the browser this is a plain text stream
+        res.setHeader("Content-Type", "text/plain; charset=utf-8")
+
         // 4. extract content and send back as json
-        let giftSuggestionStream = ""
+        let giftSuggestions = ""
 
         for await (const chunk of aiResponse) {
-            giftSuggestionStream += chunk.choices[0].delta.content
+            giftSuggestions += chunk.choices[0].delta.content
         }
 
         res.status(200).json({ giftSuggestions: giftSuggestions })
