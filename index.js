@@ -57,13 +57,15 @@ async function handleGiftRequest(e) {
       body: JSON.stringify({ userPrompt })
     })
 
-    showStream()
+    
 
     const data = await response.json()
     console.log("the data that we have on the font end: ", data)
 
     // 5. parse response and extract giftSuggestions
     const giftSuggestions = data.giftSuggestions
+
+    showStream()
 
     // The streaming process
     // let giftSuggestionsStream = ""
@@ -75,7 +77,7 @@ async function handleGiftRequest(e) {
     // Render the result
     outputContent.innerHTML = sanitizedResponse
 
-
+    
 
 
     // COMMENTED CODE BELOW BECAUSE OF THE MIGRATION TO THE BACKEND.
