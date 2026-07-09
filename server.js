@@ -205,7 +205,7 @@ app.post("/api/gift", async (req, res) => {
             giftSuggestions += chunk.choices[0].delta.content
         }
 
-        res.status(200).json({ giftSuggestions: giftSuggestions })
+        res.status(200).json({ giftSuggestions })
 
 
     } catch (error) {
